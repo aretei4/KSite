@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- API Key -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="2dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔑  jsonbin.io API KEY"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Get a free key from jsonbin.io and paste here"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="6dp"/>
+                <EditText
+                    android:id="@+id/et_api_key"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="$2a$10$..."
+                    android:inputType="textPassword"
+                    android:fontFamily="monospace"
+                    android:textSize="13sp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Save to backend -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="2dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="☁  SAVE TO BACKEND"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/green"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Backs up all sites, workers, payments, collections and month closes to jsonbin.io"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="10dp"/>
+                <Button
+                    android:id="@+id/btn_backup"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="Backup Now"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/green"
+                    android:textColor="#FFFFFF"/>
+                <TextView
+                    android:id="@+id/tv_bin_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="@color/green"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="monospace"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Restore from backend -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="2dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="RESTORE FROM BACKEND"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/accent"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enter your Bin ID to restore data on this or another device"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="6dp"/>
+                <EditText
+                    android:id="@+id/et_bin_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Paste Bin ID here"
+                    android:fontFamily="monospace"
+                    android:textSize="12sp"/>
+                <Button
+                    android:id="@+id/btn_restore"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="Restore Data"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/accent"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginTop="8dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Status -->
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="@color/text_primary"
+            android:padding="12dp"
+            android:background="@color/card"
+            android:gravity="center"
+            android:minHeight="48dp"/>
+
+    </LinearLayout>
+</ScrollView>

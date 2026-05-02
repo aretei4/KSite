@@ -1,0 +1,6 @@
+-keep class com.khaga.mobile.ksite.data.model.** { *; }
+-keep class com.khaga.mobile.ksite.network.** { *; }
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn okhttp3.**
+-dontwarn retrofit2.**

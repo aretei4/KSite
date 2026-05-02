@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/giveFragment">
+
+    <fragment
+        android:id="@+id/giveFragment"
+        android:name="com.khaga.mobile.ksite.ui.give.GiveFragment"
+        android:label="Give"/>
+
+    <fragment
+        android:id="@+id/collectFragment"
+        android:name="com.khaga.mobile.ksite.ui.collect.CollectFragment"
+        android:label="Collect"/>
+
+    <fragment
+        android:id="@+id/monthCloseFragment"
+        android:name="com.khaga.mobile.ksite.ui.monthclose.MonthCloseFragment"
+        android:label="Month Close"/>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.khaga.mobile.ksite.ui.settings.SettingsFragment"
+        android:label="Settings"/>
+</navigation>

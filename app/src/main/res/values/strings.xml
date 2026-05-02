@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Khaga Site</string>
+    <string name="nav_give">Give</string>
+    <string name="nav_collect">Collect</string>
+    <string name="nav_month">Month</string>
+    <string name="nav_settings">Settings</string>
+</resources>

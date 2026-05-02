@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:padding="16dp">
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="SITE NAME" android:textSize="10sp" android:textStyle="bold" android:textColor="@color/text_secondary"/>
+    <EditText android:id="@+id/et_name" android:layout_width="match_parent"
+        android:layout_height="48dp" android:hint="e.g. Nayapalli"/>
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="ROUGH ESTIMATE ₹" android:textSize="10sp" android:textStyle="bold"
+        android:textColor="@color/text_secondary" android:layout_marginTop="8dp"/>
+    <EditText android:id="@+id/et_estimate" android:layout_width="match_parent"
+        android:layout_height="48dp" android:inputType="number" android:hint="250000"/>
+</LinearLayout>

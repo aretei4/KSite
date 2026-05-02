@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/giveFragment"
+        android:icon="@drawable/ic_give"
+        android:title="@string/nav_give"/>
+    <item
+        android:id="@+id/collectFragment"
+        android:icon="@drawable/ic_collect"
+        android:title="@string/nav_collect"/>
+    <item
+        android:id="@+id/monthCloseFragment"
+        android:icon="@drawable/ic_month"
+        android:title="@string/nav_month"/>
+    <item
+        android:id="@+id/settingsFragment"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/nav_settings"/>
+</menu>

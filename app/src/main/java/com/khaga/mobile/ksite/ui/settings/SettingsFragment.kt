@@ -201,20 +201,39 @@ class WorkersTabFragment : Fragment() {
             }
         }
 
-        AlertDialog.Builder(requireContext())
+        val dialog = AlertDialog.Builder(requireContext())
             .setTitle(if (existing != null) "Edit Worker" else "Add Worker")
             .setView(v)
-            .setPositiveButton("Save") { _, _ ->
-                val name = etName.text.toString().trim(); if (name.isBlank()) return@setPositiveButton
-                val wage = etWage.text.toString().toLongOrNull() ?: return@setPositiveButton
-                vm.upsertWorker(Worker(
-                    id = existing?.id ?: UUID.randomUUID().toString(),
-                    name = name, wagePerDay = wage,
-                    mobile = etMobile.text.toString(), address = etAddress.text.toString(),
-                    photoPath = currentPhoto ?: existing?.photoPath
-                ))
+            .setPositiveButton("Save", null)   // null → prevents auto-dismiss so we can validate
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val name = etName.text.toString().trim()
+                if (name.isBlank()) {
+                    etName.error = "Name is required"
+                    return@setOnClickListener
+                }
+                val wage = etWage.text.toString().trim().toLongOrNull()
+                if (wage == null || wage <= 0) {
+                    etWage.error = "Enter a valid daily wage"
+                    return@setOnClickListener
+                }
+                vm.upsertWorker(
+                    Worker(
+                        id        = existing?.id ?: UUID.randomUUID().toString(),
+                        name      = name,
+                        wagePerDay = wage,
+                        mobile    = etMobile.text.toString().trim(),
+                        address   = etAddress.text.toString().trim(),
+                        photoPath = currentPhoto ?: existing?.photoPath
+                    )
+                )
+                dialog.dismiss()
             }
-            .setNegativeButton("Cancel", null).show()
+        }
+        dialog.show()
     }
 }
 

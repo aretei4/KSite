@@ -8,13 +8,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentStateAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ListAdapter
 import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
-import androidx.viewpager2.widget.ViewPager2
 import com.khaga.mobile.ksite.R
 import com.khaga.mobile.ksite.data.model.*
 import com.khaga.mobile.ksite.databinding.FragmentSettingsBinding
@@ -35,24 +32,33 @@ class SettingsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val pagerAdapter = SettingsPagerAdapter(this)
-        @Suppress("UNCHECKED_CAST")
-        binding.viewPager.adapter = pagerAdapter as RecyclerView.Adapter<RecyclerView.ViewHolder>
-        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, pos ->
-            tab.text = when (pos) { 0 -> "Sites"; 1 -> "Workers"; else -> "Backup" }
-        }.attach()
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Sites"))
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Workers"))
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Backup"))
+
+        if (savedInstanceState == null) {
+            childFragmentManager.beginTransaction()
+                .replace(R.id.tab_container, SitesTabFragment())
+                .commit()
+        }
+
+        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                val fragment: Fragment = when (tab.position) {
+                    0    -> SitesTabFragment()
+                    1    -> WorkersTabFragment()
+                    else -> BackupTabFragment()
+                }
+                childFragmentManager.beginTransaction()
+                    .replace(R.id.tab_container, fragment)
+                    .commit()
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
     }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }
-}
-
-class SettingsPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-    override fun getItemCount() = 3
-    override fun createFragment(pos: Int): Fragment = when (pos) {
-        0 -> SitesTabFragment()
-        1 -> WorkersTabFragment()
-        else -> BackupTabFragment()
-    }
 }
 
 // ── Sites Tab ─────────────────────────────────────────────────────────────────
@@ -247,10 +253,10 @@ class BackupTabFragment : Fragment() {
                     tvBinId.text  = "Bin ID: $id"
                     vm.clearBackupStatus()
                 }
-                status == "restored" -> { tvStatus.text = "✓ Data restored!"; vm.clearBackupStatus() }
+                status == "restored"      -> { tvStatus.text = "✓ Data restored!"; vm.clearBackupStatus() }
                 status.startsWith("err:") -> { tvStatus.text = "✗ ${status.removePrefix("err:")}"; vm.clearBackupStatus() }
-                status == "saving"     -> tvStatus.text = "Saving…"
-                status == "restoring"  -> tvStatus.text = "Restoring…"
+                status == "saving"        -> tvStatus.text = "Saving…"
+                status == "restoring"     -> tvStatus.text = "Restoring…"
             }
         }
     }

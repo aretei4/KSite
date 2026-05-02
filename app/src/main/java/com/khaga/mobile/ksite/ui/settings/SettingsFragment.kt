@@ -1,11 +1,14 @@
 package com.khaga.mobile.ksite.ui.settings
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -132,9 +135,16 @@ class WorkersTabFragment : Fragment() {
     private var pendingWorkerEdit: Worker? = null
     private var photoUri: Uri? = null
 
-    private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
-        if (ok) photoUri?.let { showWorkerDialog(pendingWorkerEdit, it.toString()) }
-    }
+    private val requestCameraPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) launchCamera()
+            else Toast.makeText(requireContext(), "Camera permission is required to take a photo", Toast.LENGTH_LONG).show()
+        }
+
+    private val takePicture =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
+            if (ok) photoUri?.let { showWorkerDialog(pendingWorkerEdit, it.toString()) }
+        }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         inflater.inflate(R.layout.tab_workers, container, false)
@@ -152,6 +162,17 @@ class WorkersTabFragment : Fragment() {
         vm.workers.observe(viewLifecycleOwner) { adapter.submitList(it) }
     }
 
+    /** Prepares the output file and fires the camera intent. */
+    private fun launchCamera() {
+        val file = File(requireContext().filesDir, "worker_${UUID.randomUUID()}.jpg")
+        photoUri = FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.provider",
+            file
+        )
+        takePicture.launch(photoUri!!)
+    }
+
     private fun showWorkerDialog(existing: Worker?, currentPhoto: String?) {
         val v = layoutInflater.inflate(R.layout.dialog_worker, null)
         val etName    = v.findViewById<EditText>(R.id.et_name)
@@ -161,14 +182,23 @@ class WorkersTabFragment : Fragment() {
         val btnPhoto  = v.findViewById<Button>(R.id.btn_photo)
         val ivPhoto   = v.findViewById<android.widget.ImageView>(R.id.iv_photo)
 
-        existing?.let { etName.setText(it.name); etWage.setText(it.wagePerDay.toString()); etMobile.setText(it.mobile); etAddress.setText(it.address) }
+        existing?.let {
+            etName.setText(it.name)
+            etWage.setText(it.wagePerDay.toString())
+            etMobile.setText(it.mobile)
+            etAddress.setText(it.address)
+        }
         currentPhoto?.let { ivPhoto.setImageURI(Uri.parse(it)); ivPhoto.visibility = View.VISIBLE }
 
         btnPhoto.setOnClickListener {
             pendingWorkerEdit = existing
-            val file = File(requireContext().filesDir, "worker_${UUID.randomUUID()}.jpg")
-            photoUri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.provider", file)
-            takePicture.launch(photoUri)
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED
+            ) {
+                launchCamera()
+            } else {
+                requestCameraPermission.launch(Manifest.permission.CAMERA)
+            }
         }
 
         AlertDialog.Builder(requireContext())

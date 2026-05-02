@@ -6,4 +6,5 @@ app/build/
 local.properties
 *.keystore
 .DS_Store
+ .claude/
 captures/

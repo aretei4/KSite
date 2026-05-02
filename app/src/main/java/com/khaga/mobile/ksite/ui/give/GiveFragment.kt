@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.*
+import androidx.recyclerview.widget.ListAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.khaga.mobile.ksite.R
 import com.khaga.mobile.ksite.data.model.*

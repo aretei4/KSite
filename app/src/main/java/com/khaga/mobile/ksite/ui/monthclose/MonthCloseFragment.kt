@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
+import androidx.recyclerview.widget.ListAdapter
 import com.khaga.mobile.ksite.R
 import com.khaga.mobile.ksite.data.model.MonthClose
 import com.khaga.mobile.ksite.databinding.FragmentListBinding

@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.livedata)
     implementation(libs.lifecycle.runtime)
+    implementation(libs.fragment.ktx)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.room.runtime)

@@ -48,7 +48,7 @@ class KhagaRepository(private val context: Context) {
     // ── Collections ────────────────────────────────────────────────────────
     val collectionsLive = db.collectionDao().getAllLive()
     suspend fun getCollections() = db.collectionDao().getAll()
-    suspend fun upsertCollection(c: Collection) = db.collectionDao().insert(c)
+    suspend fun upsertCollection(c: SiteCollection) = db.collectionDao().insert(c)
     suspend fun deleteCollection(id: String) = db.collectionDao().deleteById(id)
 
     // ── Month Closes ───────────────────────────────────────────────────────

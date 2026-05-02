@@ -8,8 +8,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentStateAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.*
+import androidx.recyclerview.widget.ListAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import androidx.viewpager2.widget.ViewPager2
@@ -34,7 +36,8 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val pagerAdapter = SettingsPagerAdapter(this)
-        binding.viewPager.adapter = pagerAdapter
+        @Suppress("UNCHECKED_CAST")
+        binding.viewPager.adapter = pagerAdapter as RecyclerView.Adapter<RecyclerView.ViewHolder>
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, pos ->
             tab.text = when (pos) { 0 -> "Sites"; 1 -> "Workers"; else -> "Backup" }
         }.attach()
@@ -43,7 +46,7 @@ class SettingsFragment : Fragment() {
     override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }
 
-class SettingsPagerAdapter(fragment: Fragment) : androidx.fragment.app.FragmentStateAdapter(fragment) {
+class SettingsPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount() = 3
     override fun createFragment(pos: Int): Fragment = when (pos) {
         0 -> SitesTabFragment()

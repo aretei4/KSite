@@ -19,7 +19,7 @@ data class BackupData(
     val sites: List<Site>,
     val workers: List<WorkerBackup>,   // no photo bytes
     val payments: List<Payment>,
-    val collections: List<Collection>,
+    val collections: List<SiteCollection>,
     val monthCloses: List<MonthClose>,
     val backupAt: String
 )

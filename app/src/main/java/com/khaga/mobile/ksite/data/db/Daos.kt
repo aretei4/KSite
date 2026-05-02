@@ -73,22 +73,22 @@ interface PaymentDao {
 @Dao
 interface CollectionDao {
     @Query("SELECT * FROM collections ORDER BY date DESC, createdAt DESC")
-    fun getAllLive(): LiveData<List<Collection>>
+    fun getAllLive(): LiveData<List<SiteCollection>>
 
     @Query("SELECT * FROM collections ORDER BY date DESC, createdAt DESC")
-    suspend fun getAll(): List<Collection>
+    suspend fun getAll(): List<SiteCollection>
 
     @Query("SELECT * FROM collections WHERE siteId = :sId ORDER BY date DESC")
-    fun getBySiteLive(sId: String): LiveData<List<Collection>>
+    fun getBySiteLive(sId: String): LiveData<List<SiteCollection>>
 
     @Query("SELECT SUM(received) FROM collections WHERE siteId = :sId")
     suspend fun totalReceivedBySite(sId: String): Long?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(collection: Collection)
+    suspend fun insert(collection: SiteCollection)
 
     @Update
-    suspend fun update(collection: Collection)
+    suspend fun update(collection: SiteCollection)
 
     @Query("DELETE FROM collections WHERE id = :id")
     suspend fun deleteById(id: String)

@@ -39,7 +39,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun deletePayment(id: String) = viewModelScope.launch { repo.deletePayment(id) }
 
     // ── Collections ──────────────────────────────────────────────────────
-    fun upsertCollection(c: Collection) = viewModelScope.launch { repo.upsertCollection(c) }
+    fun upsertCollection(c: SiteCollection) = viewModelScope.launch { repo.upsertCollection(c) }
     fun deleteCollection(id: String) = viewModelScope.launch { repo.deleteCollection(id) }
 
     // ── Month Close ──────────────────────────────────────────────────────

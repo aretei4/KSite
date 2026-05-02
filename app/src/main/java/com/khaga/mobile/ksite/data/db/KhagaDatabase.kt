@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.khaga.mobile.ksite.data.model.*
 
 @Database(
-    entities = [Site::class, Worker::class, Payment::class, Collection::class, MonthClose::class],
+    entities = [Site::class, Worker::class, Payment::class, SiteCollection::class, MonthClose::class],
     version = 1,
     exportSchema = false
 )

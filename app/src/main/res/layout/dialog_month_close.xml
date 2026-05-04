@@ -309,6 +309,29 @@
                     android:textColor="@color/text_primary"/>
             </LinearLayout>
 
+            <!-- Wages paid (mid-month) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="6dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Wages paid"
+                    android:textSize="13sp"
+                    android:textColor="@color/text_secondary"/>
+                <TextView
+                    android:id="@+id/tv_wages_paid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="₹0"
+                    android:textSize="13sp"
+                    android:textColor="@color/text_primary"/>
+            </LinearLayout>
+
             <!-- Other -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -362,6 +385,33 @@
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:textColor="@color/red"/>
+            </LinearLayout>
+
+            <!-- Previous balance (carry forward) — hidden when zero -->
+            <LinearLayout
+                android:id="@+id/row_carry_forward"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="6dp"
+                android:visibility="gone">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Previous balance"
+                    android:textSize="13sp"
+                    android:textStyle="italic"
+                    android:textColor="#2563EB"/>
+                <TextView
+                    android:id="@+id/tv_carry_forward"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="₹0"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#2563EB"/>
             </LinearLayout>
 
             <!-- ── Dark summary bar ──────────────────────────────── -->

@@ -56,6 +56,8 @@ class KhagaRepository(private val context: Context) {
     suspend fun getMonthCloses() = db.monthCloseDao().getAll()
     suspend fun insertMonthClose(mc: MonthClose) = db.monthCloseDao().insert(mc)
     suspend fun deleteMonthClose(id: String) = db.monthCloseDao().deleteById(id)
+    suspend fun lastMonthClose(workerId: String, siteId: String, beforeMonth: String) =
+        db.monthCloseDao().getPreviousMonthClose(workerId, siteId, beforeMonth)
 
     // ── Stats ──────────────────────────────────────────────────────────────
     suspend fun totalReceivedBySite(siteId: String) = db.collectionDao().totalReceivedBySite(siteId) ?: 0L

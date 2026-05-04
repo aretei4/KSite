@@ -49,10 +49,13 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     // ── Month close calculation ──────────────────────────────────────────
     suspend fun calcMonthClose(workerId: String, siteId: String, month: String): MonthCloseSummary {
         val payments = repo.paymentsByWorkerSiteMonth(workerId, siteId, month)
-        val adv   = payments.filter { it.head == "Advance"     }.sumOf { it.amount }
-        val tra   = payments.filter { it.head == "Travel"      }.sumOf { it.amount }
-        val other = payments.filter { !listOf("Wages","Advance","Travel").contains(it.head) }.sumOf { it.amount }
-        return MonthCloseSummary(adv, tra, other, adv + tra + other)
+        val adv   = payments.filter { it.head == "Advance" }.sumOf { it.amount }
+        val tra   = payments.filter { it.head == "Travel"  }.sumOf { it.amount }
+        val wpaid = payments.filter { it.head == "Wages"   }.sumOf { it.amount }
+        val other = payments.filter { it.head !in listOf("Wages", "Advance", "Travel") }.sumOf { it.amount }
+        val carry = repo.lastMonthClose(workerId, siteId, month)?.netPayable ?: 0L
+        val total = adv + tra + wpaid + other
+        return MonthCloseSummary(adv, tra, wpaid, other, total, carry)
     }
 
     // ── Settings ─────────────────────────────────────────────────────────
@@ -89,6 +92,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 data class MonthCloseSummary(
     val advanceTaken: Long,
     val travelTaken: Long,
+    val wagesPaid: Long,      // wages already paid mid-month via Give tab
     val otherTaken: Long,
-    val totalTaken: Long
+    val totalTaken: Long,
+    val carryForward: Long    // previous month's netPayable for same worker+site
 )

@@ -15,7 +15,7 @@ object Fmt {
         return try {
             val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val dt = sdf.parse(iso) ?: return iso
-            SimpleDateFormat("d MMM", Locale.getDefault()).format(dt)
+            SimpleDateFormat("dd/MM/yy", Locale.getDefault()).format(dt)
         } catch (e: Exception) { iso }
     }
 

@@ -102,6 +102,9 @@ interface MonthCloseDao {
     @Query("SELECT * FROM month_closes ORDER BY month DESC, closedAt DESC")
     suspend fun getAll(): List<MonthClose>
 
+    @Query("SELECT * FROM month_closes WHERE workerId = :wId AND siteId = :sId AND month < :month ORDER BY month DESC LIMIT 1")
+    suspend fun getPreviousMonthClose(wId: String, sId: String, month: String): MonthClose?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(mc: MonthClose)
 

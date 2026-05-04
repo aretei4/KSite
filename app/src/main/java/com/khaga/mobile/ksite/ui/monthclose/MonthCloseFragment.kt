@@ -86,8 +86,11 @@ class MonthCloseFragment : Fragment() {
         val tvTakenHeader      = v.findViewById<TextView>(R.id.tv_taken_header)
         val tvAdvanceTaken     = v.findViewById<TextView>(R.id.tv_advance_taken)
         val tvTravelTaken      = v.findViewById<TextView>(R.id.tv_travel_taken)
+        val tvWagesPaid        = v.findViewById<TextView>(R.id.tv_wages_paid)
         val tvOtherTaken       = v.findViewById<TextView>(R.id.tv_other_taken)
         val tvTotalTakenDisplay= v.findViewById<TextView>(R.id.tv_total_taken_display)
+        val rowCarryForward    = v.findViewById<View>(R.id.row_carry_forward)
+        val tvCarryForward     = v.findViewById<TextView>(R.id.tv_carry_forward)
         val tvWageEarned       = v.findViewById<TextView>(R.id.tv_wage_earned)
         val tvNetPayable       = v.findViewById<TextView>(R.id.tv_net_payable)
         val tvWageFormula      = v.findViewById<TextView>(R.id.tv_wage_formula)
@@ -99,29 +102,40 @@ class MonthCloseFragment : Fragment() {
         spWorker.adapter = ArrayAdapter(requireContext(), R.layout.item_spinner, workers.map { "${it.name} (${Fmt.money(it.wagePerDay)}/day)" }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
         etMonth.setText(Fmt.currentMonthIso())
 
-        // Cached taken total for net payable calculation
-        var takenTotal = 0L
+        // Shared state updated by updateTaken(), consumed by recalc()
+        var takenTotal   = 0L
+        var carryForward = 0L
 
         fun updateTaken() {
             val w     = workers.getOrNull(spWorker.selectedItemPosition) ?: return
             val s     = sites.getOrNull(spSite.selectedItemPosition) ?: return
             val month = etMonth.text.toString().trim()
 
-            // Compute from in-memory payments list for a live preview
+            // Live preview from in-memory payments
             val payments = vm.payments.value?.filter {
                 it.workerId == w.id && it.siteId == s.id && it.date.startsWith(month)
             } ?: emptyList()
 
-            val adv  = payments.filter { it.head == "Advance" }.sumOf { it.amount }
-            val trav = payments.filter { it.head == "Travel"  }.sumOf { it.amount }
-            val oth  = payments.filter { it.head !in listOf("Wages", "Advance", "Travel") }.sumOf { it.amount }
-            takenTotal = adv + trav + oth
+            val adv   = payments.filter { it.head == "Advance" }.sumOf { it.amount }
+            val trav  = payments.filter { it.head == "Travel"  }.sumOf { it.amount }
+            val wpaid = payments.filter { it.head == "Wages"   }.sumOf { it.amount }
+            val oth   = payments.filter { it.head !in listOf("Wages", "Advance", "Travel") }.sumOf { it.amount }
+            takenTotal = adv + trav + wpaid + oth
 
-            tvTakenHeader.text      = "Amounts already taken (${Fmt.monthLabel(month)})"
-            tvAdvanceTaken.text     = Fmt.money(adv)
-            tvTravelTaken.text      = Fmt.money(trav)
-            tvOtherTaken.text       = Fmt.money(oth)
-            tvTotalTakenDisplay.text= Fmt.money(takenTotal)
+            // Carry forward = previous month close net for same worker+site
+            carryForward = vm.monthCloses.value
+                ?.filter { it.workerId == w.id && it.siteId == s.id && it.month < month }
+                ?.maxByOrNull { it.month }
+                ?.netPayable ?: 0L
+
+            tvTakenHeader.text       = "Amounts already taken (${Fmt.monthLabel(month)})"
+            tvAdvanceTaken.text      = Fmt.money(adv)
+            tvTravelTaken.text       = Fmt.money(trav)
+            tvWagesPaid.text         = Fmt.money(wpaid)
+            tvOtherTaken.text        = Fmt.money(oth)
+            tvTotalTakenDisplay.text = Fmt.money(takenTotal)
+            tvCarryForward.text      = Fmt.money(carryForward)
+            rowCarryForward.visibility = if (carryForward != 0L) View.VISIBLE else View.GONE
         }
 
         fun recalc() {
@@ -133,12 +147,13 @@ class MonthCloseFragment : Fragment() {
             val a         = etAbsent.text.toString().toIntOrNull() ?: 0
             val remaining = totalDays - p - h - a
             val earned    = ((p + h * 0.5) * w.wagePerDay).toLong()
+            val net       = earned - takenTotal + carryForward
 
             tvMonthInfo.text   = "📅 ${Fmt.monthLabel(month)} — $totalDays days total"
             tvRemaining.text   = "Remaining: $remaining days"
             tvWageEarned.text  = Fmt.money(earned)
-            tvNetPayable.text  = Fmt.money(earned - takenTotal)
-            tvWageFormula.text = "${p}d + ${h}×½ = ${Fmt.money(w.wagePerDay)}"
+            tvNetPayable.text  = Fmt.money(net)
+            tvWageFormula.text = "${p}d + ${h}×½ × ${Fmt.money(w.wagePerDay)}/day"
         }
 
         // Wire month date picker here, after local funs are declared
@@ -202,9 +217,11 @@ class MonthCloseFragment : Fragment() {
                     workerId     = w.id, siteId = s.id, month = month,
                     daysPresent  = p, daysHalf = h, daysAbsent = a, totalDays = totalDays,
                     wageEarned   = earned,
-                    advanceTaken = taken.advanceTaken, travelTaken = taken.travelTaken,
-                    otherTaken   = taken.otherTaken,  totalTaken  = taken.totalTaken,
-                    netPayable   = earned - taken.totalTaken
+                    advanceTaken = taken.advanceTaken,
+                    travelTaken  = taken.travelTaken,
+                    otherTaken   = taken.wagesPaid + taken.otherTaken,  // wages paid + misc
+                    totalTaken   = taken.totalTaken,
+                    netPayable   = earned - taken.totalTaken + taken.carryForward
                 ))
                 dialog.dismiss()
             }

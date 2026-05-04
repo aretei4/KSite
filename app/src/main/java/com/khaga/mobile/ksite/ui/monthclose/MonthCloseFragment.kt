@@ -78,61 +78,122 @@ class MonthCloseFragment : Fragment() {
         val etPresent = v.findViewById<EditText>(R.id.et_present)
         val etHalf    = v.findViewById<EditText>(R.id.et_half)
         val etAbsent  = v.findViewById<EditText>(R.id.et_absent)
-        val tvSummary = v.findViewById<TextView>(R.id.tv_calc_summary)
+
+        val tvMonthInfo        = v.findViewById<TextView>(R.id.tv_month_info)
+        val tvRemaining        = v.findViewById<TextView>(R.id.tv_remaining)
+        val tvTakenHeader      = v.findViewById<TextView>(R.id.tv_taken_header)
+        val tvAdvanceTaken     = v.findViewById<TextView>(R.id.tv_advance_taken)
+        val tvTravelTaken      = v.findViewById<TextView>(R.id.tv_travel_taken)
+        val tvOtherTaken       = v.findViewById<TextView>(R.id.tv_other_taken)
+        val tvTotalTakenDisplay= v.findViewById<TextView>(R.id.tv_total_taken_display)
+        val tvWageEarned       = v.findViewById<TextView>(R.id.tv_wage_earned)
+        val tvNetPayable       = v.findViewById<TextView>(R.id.tv_net_payable)
+        val tvWageFormula      = v.findViewById<TextView>(R.id.tv_wage_formula)
 
         spSite.adapter   = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sites.map { it.name }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
         spWorker.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, workers.map { "${it.name} (${Fmt.money(it.wagePerDay)}/day)" }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
         etMonth.setText(Fmt.currentMonthIso())
 
+        // Cached taken total for net payable calculation
+        var takenTotal = 0L
+
+        fun updateTaken() {
+            val w     = workers.getOrNull(spWorker.selectedItemPosition) ?: return
+            val s     = sites.getOrNull(spSite.selectedItemPosition) ?: return
+            val month = etMonth.text.toString().trim()
+
+            // Compute from in-memory payments list for a live preview
+            val payments = vm.payments.value?.filter {
+                it.workerId == w.id && it.siteId == s.id && it.date.startsWith(month)
+            } ?: emptyList()
+
+            val adv  = payments.filter { it.head == "Advance" }.sumOf { it.amount }
+            val trav = payments.filter { it.head == "Travel"  }.sumOf { it.amount }
+            val oth  = payments.filter { it.head !in listOf("Wages", "Advance", "Travel") }.sumOf { it.amount }
+            takenTotal = adv + trav + oth
+
+            tvTakenHeader.text      = "Amounts already taken (${Fmt.monthLabel(month)})"
+            tvAdvanceTaken.text     = Fmt.money(adv)
+            tvTravelTaken.text      = Fmt.money(trav)
+            tvOtherTaken.text       = Fmt.money(oth)
+            tvTotalTakenDisplay.text= Fmt.money(takenTotal)
+        }
+
         fun recalc() {
-            val w = workers.getOrNull(spWorker.selectedItemPosition) ?: return
-            val p = etPresent.text.toString().toIntOrNull() ?: 0
-            val h = etHalf.text.toString().toIntOrNull() ?: 0
-            val totalDays = Fmt.daysInMonth(etMonth.text.toString())
-            val remaining = totalDays - p - h - (etAbsent.text.toString().toIntOrNull() ?: 0)
-            val earned = ((p + h * 0.5) * w.wagePerDay).toLong()
-            tvSummary.text = "Wage earned: ${Fmt.money(earned)}\nRemaining/unaccounted: $remaining days"
+            val w         = workers.getOrNull(spWorker.selectedItemPosition) ?: return
+            val month     = etMonth.text.toString().trim()
+            val totalDays = Fmt.daysInMonth(month)
+            val p         = etPresent.text.toString().toIntOrNull() ?: 0
+            val h         = etHalf.text.toString().toIntOrNull() ?: 0
+            val a         = etAbsent.text.toString().toIntOrNull() ?: 0
+            val remaining = totalDays - p - h - a
+            val earned    = ((p + h * 0.5) * w.wagePerDay).toLong()
+
+            tvMonthInfo.text   = "📅 ${Fmt.monthLabel(month)} — $totalDays days total"
+            tvRemaining.text   = "Remaining: $remaining days"
+            tvWageEarned.text  = Fmt.money(earned)
+            tvNetPayable.text  = Fmt.money(earned - takenTotal)
+            tvWageFormula.text = "${p}d + ${h}×½ = ${Fmt.money(w.wagePerDay)}"
         }
 
-        spWorker.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(p: AdapterView<*>?, v: View?, pos: Int, id: Long) = recalc()
-            override fun onNothingSelected(p: AdapterView<*>?) {}
-        }
-        listOf(etPresent, etHalf, etAbsent).forEach { et ->
-            et.addTextChangedListener(object : android.text.TextWatcher {
-                override fun afterTextChanged(s: android.text.Editable?) = recalc()
-                override fun beforeTextChanged(s: CharSequence?, st: Int, c: Int, a: Int) {}
-                override fun onTextChanged(s: CharSequence?, st: Int, b: Int, c: Int) {}
-            })
+        val attendanceWatcher = object : android.text.TextWatcher {
+            override fun afterTextChanged(s: android.text.Editable?) = recalc()
+            override fun beforeTextChanged(s: CharSequence?, st: Int, c: Int, a: Int) {}
+            override fun onTextChanged(s: CharSequence?, st: Int, b: Int, c: Int) {}
         }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("Close Month")
-            .setView(v)
-            .setPositiveButton("Save") { _, _ ->
-                val w     = workers[spWorker.selectedItemPosition]
-                val s     = sites[spSite.selectedItemPosition]
-                val month = etMonth.text.toString()
-                val p     = etPresent.text.toString().toIntOrNull() ?: 0
-                val h     = etHalf.text.toString().toIntOrNull() ?: 0
-                val a     = etAbsent.text.toString().toIntOrNull() ?: 0
-                val totalDays = Fmt.daysInMonth(month)
-                val earned    = ((p + h * 0.5) * w.wagePerDay).toLong()
-
-                lifecycleScope.launch {
-                    val taken = vm.calcMonthClose(w.id, s.id, month)
-                    vm.insertMonthClose(MonthClose(
-                        id           = UUID.randomUUID().toString(),
-                        workerId     = w.id, siteId = s.id, month = month,
-                        daysPresent  = p, daysHalf = h, daysAbsent = a, totalDays = totalDays,
-                        wageEarned   = earned,
-                        advanceTaken = taken.advanceTaken, travelTaken = taken.travelTaken,
-                        otherTaken   = taken.otherTaken,  totalTaken  = taken.totalTaken,
-                        netPayable   = earned - taken.totalTaken
-                    ))
-                }
+        val selectionListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(p0: AdapterView<*>?, view: View?, pos: Int, id: Long) {
+                updateTaken(); recalc()
             }
-            .setNegativeButton("Cancel", null).show()
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+        }
+
+        spWorker.onItemSelectedListener = selectionListener
+        spSite.onItemSelectedListener   = selectionListener
+        listOf(etPresent, etHalf, etAbsent).forEach { it.addTextChangedListener(attendanceWatcher) }
+        etMonth.addTextChangedListener(object : android.text.TextWatcher {
+            override fun afterTextChanged(s: android.text.Editable?) { updateTaken(); recalc() }
+            override fun beforeTextChanged(s: CharSequence?, st: Int, c: Int, a: Int) {}
+            override fun onTextChanged(s: CharSequence?, st: Int, b: Int, c: Int) {}
+        })
+
+        // Initial render
+        updateTaken()
+        recalc()
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(v)
+            .create()
+
+        v.findViewById<View>(R.id.tv_dialog_close).setOnClickListener { dialog.dismiss() }
+
+        v.findViewById<View>(R.id.btn_save_month).setOnClickListener {
+            val w     = workers[spWorker.selectedItemPosition]
+            val s     = sites[spSite.selectedItemPosition]
+            val month = etMonth.text.toString().trim()
+            val p     = etPresent.text.toString().toIntOrNull() ?: 0
+            val h     = etHalf.text.toString().toIntOrNull() ?: 0
+            val a     = etAbsent.text.toString().toIntOrNull() ?: 0
+            val totalDays = Fmt.daysInMonth(month)
+            val earned    = ((p + h * 0.5) * w.wagePerDay).toLong()
+
+            lifecycleScope.launch {
+                val taken = vm.calcMonthClose(w.id, s.id, month)
+                vm.insertMonthClose(MonthClose(
+                    id           = UUID.randomUUID().toString(),
+                    workerId     = w.id, siteId = s.id, month = month,
+                    daysPresent  = p, daysHalf = h, daysAbsent = a, totalDays = totalDays,
+                    wageEarned   = earned,
+                    advanceTaken = taken.advanceTaken, travelTaken = taken.travelTaken,
+                    otherTaken   = taken.otherTaken,  totalTaken  = taken.totalTaken,
+                    netPayable   = earned - taken.totalTaken
+                ))
+                dialog.dismiss()
+            }
+        }
+
+        dialog.show()
     }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }

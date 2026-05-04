@@ -73,7 +73,10 @@ class GiveFragment : Fragment() {
 
         fun updateHint() {
             val w = workers.getOrNull(spWorker.selectedItemPosition)
-            if (w != null) tvHint.text = "Rate: ${Fmt.money(w.wagePerDay)}/day"
+            if (w != null) {
+                tvHint.text = "Rate: ${Fmt.money(w.wagePerDay)}/day"
+                tvHint.visibility = View.VISIBLE
+            }
         }
         spWorker.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p: AdapterView<*>?, v: View?, pos: Int, id: Long) = updateHint()
@@ -93,24 +96,29 @@ class GiveFragment : Fragment() {
             etDate.setText(Fmt.todayIso())
         }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle(if (existing != null) "Edit Payment" else "Record Payment")
+        val dialog = AlertDialog.Builder(requireContext())
             .setView(v)
-            .setPositiveButton("Save") { _, _ ->
-                val amt = etAmount.text.toString().toLongOrNull() ?: return@setPositiveButton
-                vm.upsertPayment(Payment(
-                    id       = existing?.id ?: UUID.randomUUID().toString(),
-                    workerId = workers[spWorker.selectedItemPosition].id,
-                    siteId   = sites[spSite.selectedItemPosition].id,
-                    head     = PAY_HEADS[spHead.selectedItemPosition],
-                    amount   = amt,
-                    mode     = PAY_MODES[spMode.selectedItemPosition],
-                    date     = etDate.text.toString().ifBlank { Fmt.todayIso() },
-                    note     = etNote.text.toString()
-                ))
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+            .create()
+
+        v.findViewById<View>(R.id.tv_dialog_close).setOnClickListener { dialog.dismiss() }
+
+        v.findViewById<View>(R.id.btn_save_payment).setOnClickListener {
+            val amt = etAmount.text.toString().toLongOrNull() ?: return@setOnClickListener
+            vm.upsertPayment(Payment(
+                id       = existing?.id ?: UUID.randomUUID().toString(),
+                workerId = workers[spWorker.selectedItemPosition].id,
+                siteId   = sites[spSite.selectedItemPosition].id,
+                head     = PAY_HEADS[spHead.selectedItemPosition],
+                amount   = amt,
+                mode     = PAY_MODES[spMode.selectedItemPosition],
+                date     = etDate.text.toString().ifBlank { Fmt.todayIso() },
+                note     = etNote.text.toString()
+            ))
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        updateHintVisible()
     }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }

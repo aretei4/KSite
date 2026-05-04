@@ -53,29 +53,12 @@
                 android:textColor="@color/text_secondary"
                 android:layout_marginBottom="6dp"/>
 
-            <LinearLayout
+            <Spinner
+                android:id="@+id/sp_site"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:background="@drawable/bg_input_field"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <Spinner
-                    android:id="@+id/sp_site"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:paddingHorizontal="12dp"
-                    android:background="@null"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="▾"
-                    android:textSize="14sp"
-                    android:textColor="@color/text_secondary"
-                    android:paddingEnd="12dp"/>
-            </LinearLayout>
+                android:paddingStart="12dp"/>
 
             <!-- WORKER -->
             <TextView
@@ -89,29 +72,12 @@
                 android:layout_marginTop="14dp"
                 android:layout_marginBottom="6dp"/>
 
-            <LinearLayout
+            <Spinner
+                android:id="@+id/sp_worker"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:background="@drawable/bg_input_field"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <Spinner
-                    android:id="@+id/sp_worker"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:paddingHorizontal="12dp"
-                    android:background="@null"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="▾"
-                    android:textSize="14sp"
-                    android:textColor="@color/text_secondary"
-                    android:paddingEnd="12dp"/>
-            </LinearLayout>
+                android:paddingStart="12dp"/>
 
             <!-- Wage hint -->
             <TextView
@@ -147,29 +113,12 @@
                         android:textColor="@color/text_secondary"
                         android:layout_marginBottom="6dp"/>
 
-                    <LinearLayout
+                    <Spinner
+                        android:id="@+id/sp_head"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
                         android:background="@drawable/bg_input_field"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <Spinner
-                            android:id="@+id/sp_head"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:paddingHorizontal="12dp"
-                            android:background="@null"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="▾"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:paddingEnd="12dp"/>
-                    </LinearLayout>
+                        android:paddingStart="12dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -196,6 +145,8 @@
                         android:paddingHorizontal="12dp"
                         android:inputType="number"
                         android:hint="0"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary"
                         android:gravity="center_vertical"/>
                 </LinearLayout>
             </LinearLayout>
@@ -224,29 +175,12 @@
                         android:textColor="@color/text_secondary"
                         android:layout_marginBottom="6dp"/>
 
-                    <LinearLayout
+                    <Spinner
+                        android:id="@+id/sp_mode"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
                         android:background="@drawable/bg_input_field"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <Spinner
-                            android:id="@+id/sp_mode"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:paddingHorizontal="12dp"
-                            android:background="@null"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="▾"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:paddingEnd="12dp"/>
-                    </LinearLayout>
+                        android:paddingStart="12dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -272,6 +206,8 @@
                         android:background="@drawable/bg_input_field"
                         android:paddingHorizontal="12dp"
                         android:inputType="date"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary"
                         android:gravity="center_vertical"/>
                 </LinearLayout>
             </LinearLayout>
@@ -295,6 +231,8 @@
                 android:background="@drawable/bg_input_field"
                 android:paddingHorizontal="12dp"
                 android:hint="e.g. April week 4"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
                 android:gravity="center_vertical"/>
 
             <!-- Save button -->

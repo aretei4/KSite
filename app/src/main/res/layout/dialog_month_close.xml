@@ -65,29 +65,12 @@
                         android:textColor="@color/text_secondary"
                         android:layout_marginBottom="6dp"/>
 
-                    <LinearLayout
+                    <Spinner
+                        android:id="@+id/sp_site"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
                         android:background="@drawable/bg_input_field"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <Spinner
-                            android:id="@+id/sp_site"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:paddingHorizontal="12dp"
-                            android:background="@null"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="▾"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:paddingEnd="10dp"/>
-                    </LinearLayout>
+                        android:paddingStart="12dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -113,6 +96,8 @@
                         android:background="@drawable/bg_input_field"
                         android:paddingHorizontal="12dp"
                         android:hint="2025-04"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary"
                         android:gravity="center_vertical"
                         android:inputType="date"/>
                 </LinearLayout>
@@ -130,29 +115,12 @@
                 android:layout_marginTop="14dp"
                 android:layout_marginBottom="6dp"/>
 
-            <LinearLayout
+            <Spinner
+                android:id="@+id/sp_worker"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:background="@drawable/bg_input_field"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <Spinner
-                    android:id="@+id/sp_worker"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:paddingHorizontal="12dp"
-                    android:background="@null"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="▾"
-                    android:textSize="14sp"
-                    android:textColor="@color/text_secondary"
-                    android:paddingEnd="12dp"/>
-            </LinearLayout>
+                android:paddingStart="12dp"/>
 
             <!-- ── Attendance section ─────────────────────────── -->
             <LinearLayout
@@ -204,6 +172,8 @@
                             android:paddingHorizontal="10dp"
                             android:inputType="number"
                             android:hint="0"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_secondary"
                             android:gravity="center_vertical"/>
                     </LinearLayout>
 
@@ -231,6 +201,8 @@
                             android:paddingHorizontal="10dp"
                             android:inputType="number"
                             android:hint="0"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_secondary"
                             android:gravity="center_vertical"/>
                     </LinearLayout>
 
@@ -257,6 +229,8 @@
                             android:paddingHorizontal="10dp"
                             android:inputType="number"
                             android:hint="0"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_secondary"
                             android:gravity="center_vertical"/>
                     </LinearLayout>
                 </LinearLayout>
@@ -284,14 +258,13 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"/>
 
-            <!-- Advance row -->
+            <!-- Advance -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingVertical="6dp">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -299,23 +272,22 @@
                     android:text="Advance"
                     android:textSize="13sp"
                     android:textColor="@color/text_secondary"/>
-
                 <TextView
                     android:id="@+id/tv_advance_taken"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="₹0"
                     android:textSize="13sp"
                     android:textColor="@color/text_primary"/>
             </LinearLayout>
 
-            <!-- Travel row -->
+            <!-- Travel -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingVertical="6dp">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -323,23 +295,22 @@
                     android:text="Travel"
                     android:textSize="13sp"
                     android:textColor="@color/text_secondary"/>
-
                 <TextView
                     android:id="@+id/tv_travel_taken"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="₹0"
                     android:textSize="13sp"
                     android:textColor="@color/text_primary"/>
             </LinearLayout>
 
-            <!-- Other row -->
+            <!-- Other -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingVertical="6dp">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -347,30 +318,29 @@
                     android:text="Other"
                     android:textSize="13sp"
                     android:textColor="@color/text_secondary"/>
-
                 <TextView
                     android:id="@+id/tv_other_taken"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="₹0"
                     android:textSize="13sp"
                     android:textColor="@color/text_primary"/>
             </LinearLayout>
 
-            <!-- Thin divider -->
+            <!-- Divider -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#E5E7EB"
                 android:layout_marginVertical="4dp"/>
 
-            <!-- Total taken row -->
+            <!-- Total taken -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingVertical="6dp">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -379,11 +349,11 @@
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"/>
-
                 <TextView
                     android:id="@+id/tv_total_taken_display"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="₹0"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:textColor="@color/red"/>

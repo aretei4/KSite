@@ -94,16 +94,6 @@ class MonthCloseFragment : Fragment() {
 
         etMonth.isFocusable = false
         etMonth.isClickable = true
-        etMonth.setOnClickListener {
-            val parts = etMonth.text.toString().split("-")
-            val y = parts.getOrNull(0)?.toIntOrNull() ?: Calendar.getInstance().get(Calendar.YEAR)
-            val m = (parts.getOrNull(1)?.toIntOrNull() ?: (Calendar.getInstance().get(Calendar.MONTH) + 1)) - 1
-            DatePickerDialog(requireContext(), { _, year, month, _ ->
-                etMonth.setText("%04d-%02d".format(year, month + 1))
-                updateTaken()
-                recalc()
-            }, y, m, 1).show()
-        }
 
         spSite.adapter   = ArrayAdapter(requireContext(), R.layout.item_spinner, sites.map { it.name }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
         spWorker.adapter = ArrayAdapter(requireContext(), R.layout.item_spinner, workers.map { "${it.name} (${Fmt.money(it.wagePerDay)}/day)" }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
@@ -149,6 +139,18 @@ class MonthCloseFragment : Fragment() {
             tvWageEarned.text  = Fmt.money(earned)
             tvNetPayable.text  = Fmt.money(earned - takenTotal)
             tvWageFormula.text = "${p}d + ${h}×½ = ${Fmt.money(w.wagePerDay)}"
+        }
+
+        // Wire month date picker here, after local funs are declared
+        etMonth.setOnClickListener {
+            val parts = etMonth.text.toString().split("-")
+            val y = parts.getOrNull(0)?.toIntOrNull() ?: Calendar.getInstance().get(Calendar.YEAR)
+            val m = (parts.getOrNull(1)?.toIntOrNull() ?: (Calendar.getInstance().get(Calendar.MONTH) + 1)) - 1
+            DatePickerDialog(requireContext(), { _, year, month, _ ->
+                etMonth.setText("%04d-%02d".format(year, month + 1))
+                updateTaken()
+                recalc()
+            }, y, m, 1).show()
         }
 
         val attendanceWatcher = object : android.text.TextWatcher {

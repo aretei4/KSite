@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 // Sealed list item for grouped display
-private sealed class ListItem {
+internal sealed class ListItem {
     data class Header(val month: String) : ListItem()
     data class Entry(val mc: MonthClose)  : ListItem()
 }

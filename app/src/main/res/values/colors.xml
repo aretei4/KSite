@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bg">#F7F6F1</color>
+    <!-- Backgrounds -->
+    <color name="bg">#F5F0E8</color>
     <color name="card">#FFFFFF</color>
-    <color name="dark">#0E1C2F</color>
+    <color name="dark">#1C2A3A</color>
+
+    <!-- Brand -->
     <color name="accent">#2563EB</color>
+
+    <!-- Semantic -->
     <color name="green">#15803D</color>
     <color name="red">#B91C1C</color>
-    <color name="amber">#B45309</color>
+    <color name="amber">#92400E</color>
     <color name="soft_blue">#EEF2FF</color>
-    <color name="text_primary">#0E1C2F</color>
-    <color name="text_secondary">#9A9890</color>
-    <color name="nav_selected">#60A5FA</color>
-    <color name="nav_unselected">#607080</color>
+
+    <!-- Text -->
+    <color name="text_primary">#111827</color>
+    <color name="text_secondary">#6B7280</color>
+
+    <!-- Bottom nav -->
+    <color name="nav_selected">#2563EB</color>
+    <color name="nav_unselected">#9CA3AF</color>
+
+    <!-- Stat badge backgrounds -->
+    <color name="badge_green_bg">#DCFCE7</color>
+    <color name="badge_red_bg">#FEE2E2</color>
+    <color name="badge_amber_bg">#FEF3C7</color>
 </resources>

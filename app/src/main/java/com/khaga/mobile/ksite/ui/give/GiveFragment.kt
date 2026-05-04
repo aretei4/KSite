@@ -1,5 +1,7 @@
 package com.khaga.mobile.ksite.ui.give
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.widget.*
@@ -8,10 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.ListAdapter
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.khaga.mobile.ksite.R
 import com.khaga.mobile.ksite.data.model.*
-import com.khaga.mobile.ksite.databinding.*
+import com.khaga.mobile.ksite.databinding.FragmentGiveBinding
 import com.khaga.mobile.ksite.util.*
 import com.khaga.mobile.ksite.viewmodel.MainViewModel
 import java.util.UUID
@@ -19,55 +20,57 @@ import java.util.UUID
 class GiveFragment : Fragment() {
 
     private val vm: MainViewModel by activityViewModels()
-    private var _binding: FragmentListBinding? = null
+    private var _binding: FragmentGiveBinding? = null
     private val binding get() = _binding!!
-    private val adapter = PaymentAdapter(
-        onEdit = { showDialog(it) },
-        onDelete = { vm.deletePayment(it.id) }
-    )
+    private lateinit var adapter: PaymentAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentListBinding.inflate(inflater, container, false)
+        _binding = FragmentGiveBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        adapter = PaymentAdapter(
+            onEdit        = { showDialog(it) },
+            onDelete      = { vm.deletePayment(it.id) },
+            getWorkerName = { id -> vm.workers.value?.firstOrNull { it.id == id }?.name ?: id },
+            getSiteName   = { id -> vm.sites.value?.firstOrNull { it.id == id }?.name ?: id }
+        )
         binding.recycler.layoutManager = LinearLayoutManager(requireContext())
         binding.recycler.adapter = adapter
-        binding.fab.setOnClickListener { showDialog(null) }
-        binding.tvTitle.text = "Give Payments"
+
+        binding.btnRecord.setOnClickListener { showDialog(null) }
 
         vm.payments.observe(viewLifecycleOwner) { list ->
             adapter.submitList(list)
-            val total = list.sumOf { it.amount }
-            binding.tvSummary.text = "Total paid out: ${Fmt.money(total)}  |  ${list.size} entries"
+            binding.tvTotalAmount.text  = Fmt.money(list.sumOf { it.amount })
+            binding.tvEntriesCount.text = list.size.toString()
         }
     }
 
     private fun showDialog(existing: Payment?) {
-        val sites = vm.sites.value ?: emptyList()
+        val sites   = vm.sites.value   ?: emptyList()
         val workers = vm.workers.value ?: emptyList()
         if (sites.isEmpty() || workers.isEmpty()) {
             Toast.makeText(requireContext(), "Add sites and workers first in Settings", Toast.LENGTH_LONG).show()
             return
         }
 
-        val v = layoutInflater.inflate(R.layout.dialog_payment, null)
-        val spSite    = v.findViewById<Spinner>(R.id.sp_site)
-        val spWorker  = v.findViewById<Spinner>(R.id.sp_worker)
-        val spHead    = v.findViewById<Spinner>(R.id.sp_head)
-        val spMode    = v.findViewById<Spinner>(R.id.sp_mode)
-        val etAmount  = v.findViewById<EditText>(R.id.et_amount)
-        val etDate    = v.findViewById<EditText>(R.id.et_date)
-        val etNote    = v.findViewById<EditText>(R.id.et_note)
-        val tvHint    = v.findViewById<TextView>(R.id.tv_wage_hint)
+        val v        = layoutInflater.inflate(R.layout.dialog_payment, null)
+        val spSite   = v.findViewById<Spinner>(R.id.sp_site)
+        val spWorker = v.findViewById<Spinner>(R.id.sp_worker)
+        val spHead   = v.findViewById<Spinner>(R.id.sp_head)
+        val spMode   = v.findViewById<Spinner>(R.id.sp_mode)
+        val etAmount = v.findViewById<EditText>(R.id.et_amount)
+        val etDate   = v.findViewById<EditText>(R.id.et_date)
+        val etNote   = v.findViewById<EditText>(R.id.et_note)
+        val tvHint   = v.findViewById<TextView>(R.id.tv_wage_hint)
 
         spSite.adapter   = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sites.map { it.name }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
         spWorker.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, workers.map { "${it.name} (${Fmt.money(it.wagePerDay)}/day)" }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
         spHead.adapter   = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, PAY_HEADS).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
         spMode.adapter   = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, PAY_MODES).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
 
-        // Show wage hint when worker selected
         fun updateHint() {
             val w = workers.getOrNull(spWorker.selectedItemPosition)
             if (w != null) tvHint.text = "Rate: ${Fmt.money(w.wagePerDay)}/day"
@@ -95,17 +98,16 @@ class GiveFragment : Fragment() {
             .setView(v)
             .setPositiveButton("Save") { _, _ ->
                 val amt = etAmount.text.toString().toLongOrNull() ?: return@setPositiveButton
-                val payment = Payment(
-                    id = existing?.id ?: UUID.randomUUID().toString(),
+                vm.upsertPayment(Payment(
+                    id       = existing?.id ?: UUID.randomUUID().toString(),
                     workerId = workers[spWorker.selectedItemPosition].id,
                     siteId   = sites[spSite.selectedItemPosition].id,
-                    head  = PAY_HEADS[spHead.selectedItemPosition],
-                    amount = amt,
-                    mode  = PAY_MODES[spMode.selectedItemPosition],
-                    date  = etDate.text.toString().ifBlank { Fmt.todayIso() },
-                    note  = etNote.text.toString()
-                )
-                vm.upsertPayment(payment)
+                    head     = PAY_HEADS[spHead.selectedItemPosition],
+                    amount   = amt,
+                    mode     = PAY_MODES[spMode.selectedItemPosition],
+                    date     = etDate.text.toString().ifBlank { Fmt.todayIso() },
+                    note     = etNote.text.toString()
+                ))
             }
             .setNegativeButton("Cancel", null)
             .show()
@@ -116,24 +118,67 @@ class GiveFragment : Fragment() {
 
 class PaymentAdapter(
     private val onEdit: (Payment) -> Unit,
-    private val onDelete: (Payment) -> Unit
+    private val onDelete: (Payment) -> Unit,
+    private val getWorkerName: (String) -> String,
+    private val getSiteName: (String) -> String
 ) : ListAdapter<Payment, PaymentAdapter.VH>(object : DiffUtil.ItemCallback<Payment>() {
     override fun areItemsTheSame(a: Payment, b: Payment) = a.id == b.id
     override fun areContentsTheSame(a: Payment, b: Payment) = a == b
 }) {
     inner class VH(val v: View) : RecyclerView.ViewHolder(v)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_payment, parent, false)
-        return VH(v)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH =
+        VH(LayoutInflater.from(parent.context).inflate(R.layout.item_payment, parent, false))
 
     override fun onBindViewHolder(h: VH, pos: Int) {
-        val p = getItem(pos)
-        h.v.findViewById<TextView>(R.id.tv_name).text = p.head
-        h.v.findViewById<TextView>(R.id.tv_sub).text  = "${Fmt.date(p.date)} · ${p.mode} · ${p.note}"
+        val p          = getItem(pos)
+        val workerName = getWorkerName(p.workerId)
+
+        // Avatar initials (up to 2 chars)
+        val initials = workerName.trim().split(" ")
+            .filter { it.isNotEmpty() }
+            .take(2)
+            .joinToString("") { it.first().uppercaseChar().toString() }
+        h.v.findViewById<TextView>(R.id.tv_initials).text = initials
+
+        h.v.findViewById<TextView>(R.id.tv_worker_name).text = workerName
+
+        // Head chip with colour coding
+        val tvHead = h.v.findViewById<TextView>(R.id.tv_head_chip)
+        tvHead.text = p.head
+        val (headBg, headFg) = headChipColors(p.head)
+        tvHead.backgroundTintList = ColorStateList.valueOf(Color.parseColor(headBg))
+        tvHead.setTextColor(Color.parseColor(headFg))
+
+        // Mode chip (neutral grey)
+        val tvMode = h.v.findViewById<TextView>(R.id.tv_mode_chip)
+        tvMode.text = p.mode
+        tvMode.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#F3F4F6"))
+        tvMode.setTextColor(Color.parseColor("#374151"))
+
+        // Site · date
+        h.v.findViewById<TextView>(R.id.tv_site_date).text =
+            "${getSiteName(p.siteId)} · ${Fmt.date(p.date)}"
+
+        // Note (hidden when blank)
+        val tvNote = h.v.findViewById<TextView>(R.id.tv_note)
+        if (p.note.isNotBlank()) {
+            tvNote.text       = p.note
+            tvNote.visibility = View.VISIBLE
+        } else {
+            tvNote.visibility = View.GONE
+        }
+
         h.v.findViewById<TextView>(R.id.tv_amount).text = Fmt.money(p.amount)
-        h.v.findViewById<View>(R.id.btn_edit).setOnClickListener { onEdit(p) }
-        h.v.findViewById<View>(R.id.btn_delete).setOnClickListener { onDelete(p) }
+        h.v.findViewById<View>(R.id.tv_edit).setOnClickListener { onEdit(p) }
+        h.v.findViewById<View>(R.id.tv_del).setOnClickListener  { onDelete(p) }
+    }
+
+    private fun headChipColors(head: String): Pair<String, String> = when (head.lowercase()) {
+        "wages"       -> "#DCFCE7" to "#16A34A"   // green
+        "advance"     -> "#EDE9FE" to "#7C3AED"   // purple
+        "travel"      -> "#FEF3C7" to "#D97706"   // amber
+        "maintenance" -> "#DBEAFE" to "#2563EB"   // blue
+        else          -> "#F3F4F6" to "#374151"   // grey
     }
 }

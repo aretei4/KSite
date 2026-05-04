@@ -79,9 +79,10 @@ class SitesTabFragment : Fragment() {
             onEdit   = { showSiteDialog(it) },
             onDelete = { vm.deleteSite(it.id) },
             getStats = { site ->
-                val payments = vm.payments.value?.filter { it.siteId == site.id }?.sumOf { it.amount } ?: 0L
+                val paidOut   = vm.payments.value?.filter { it.siteId == site.id }?.sumOf { it.amount } ?: 0L
                 val collected = vm.collections.value?.filter { it.siteId == site.id }?.sumOf { it.received } ?: 0L
-                Pair(collected, payments)
+                val invoiced  = vm.collections.value?.filter { it.siteId == site.id }?.sumOf { it.amount } ?: 0L
+                Triple(collected, paidOut, invoiced - collected)   // (collected, paidOut, pending)
             }
         )
         rv.layoutManager = LinearLayoutManager(requireContext())
@@ -109,7 +110,7 @@ class SitesTabFragment : Fragment() {
 class SiteAdapter(
     private val onEdit: (Site) -> Unit,
     private val onDelete: (Site) -> Unit,
-    private val getStats: (Site) -> Pair<Long,Long>
+    private val getStats: (Site) -> Triple<Long, Long, Long>   // (collected, paidOut, pending)
 ) : ListAdapter<Site, SiteAdapter.VH>(object : DiffUtil.ItemCallback<Site>() {
     override fun areItemsTheSame(a: Site, b: Site) = a.id == b.id
     override fun areContentsTheSame(a: Site, b: Site) = a == b
@@ -119,10 +120,24 @@ class SiteAdapter(
         VH(LayoutInflater.from(parent.context).inflate(R.layout.item_site, parent, false))
     override fun onBindViewHolder(h: VH, pos: Int) {
         val s = getItem(pos)
-        val (col, pay) = getStats(s)
-        h.v.findViewById<TextView>(R.id.tv_name).text = s.name
-        h.v.findViewById<TextView>(R.id.tv_estimate).text = "Estimate: ${Fmt.money(s.estimate)}"
-        h.v.findViewById<TextView>(R.id.tv_stats).text = "Collected: ${Fmt.money(col)}  Paid: ${Fmt.money(pay)}  Net: ${Fmt.money(col-pay)}"
+        val (col, pay, pending) = getStats(s)
+        val gain = col - pay
+
+        h.v.findViewById<TextView>(R.id.tv_name).text      = s.name
+        h.v.findViewById<TextView>(R.id.tv_estimate).text  = "Estimate: ${Fmt.money(s.estimate)}"
+        h.v.findViewById<TextView>(R.id.tv_collected).text = Fmt.money(col)
+        h.v.findViewById<TextView>(R.id.tv_paid).text      = Fmt.money(pay)
+        h.v.findViewById<TextView>(R.id.tv_gain).text      = Fmt.money(gain)
+
+        val llPending = h.v.findViewById<View>(R.id.ll_pending)
+        val tvPending = h.v.findViewById<TextView>(R.id.tv_pending)
+        if (pending > 0) {
+            llPending.visibility = View.VISIBLE
+            tvPending.text = Fmt.money(pending)
+        } else {
+            llPending.visibility = View.GONE
+        }
+
         h.v.findViewById<View>(R.id.btn_edit).setOnClickListener { onEdit(s) }
         h.v.findViewById<View>(R.id.btn_delete).setOnClickListener { onDelete(s) }
     }
@@ -154,7 +169,15 @@ class WorkersTabFragment : Fragment() {
         val btnAdd = view.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab_add_worker)
         val adapter = WorkerAdapter(
             onEdit   = { showWorkerDialog(it, it.photoPath) },
-            onDelete = { vm.deleteWorker(it.id) }
+            onDelete = { vm.deleteWorker(it.id) },
+            getStats = { worker ->
+                val workerPayments = vm.payments.value?.filter { it.workerId == worker.id } ?: emptyList()
+                val totalPaid  = workerPayments.sumOf { it.amount }
+                val lastPayment = workerPayments.maxByOrNull { it.date }
+                val lastMonth   = lastPayment?.let { Fmt.date(it.date) }
+                val lastSummary = lastPayment?.let { "${Fmt.money(it.amount)} · ${it.head}" }
+                Triple(totalPaid, lastMonth, lastSummary)
+            }
         )
         rv.layoutManager = LinearLayoutManager(requireContext())
         rv.adapter = adapter
@@ -239,7 +262,8 @@ class WorkersTabFragment : Fragment() {
 
 class WorkerAdapter(
     private val onEdit: (Worker) -> Unit,
-    private val onDelete: (Worker) -> Unit
+    private val onDelete: (Worker) -> Unit,
+    private val getStats: (Worker) -> Triple<Long, String?, String?>  // (totalPaid, lastPayDate, lastPaySummary)
 ) : ListAdapter<Worker, WorkerAdapter.VH>(object : DiffUtil.ItemCallback<Worker>() {
     override fun areItemsTheSame(a: Worker, b: Worker) = a.id == b.id
     override fun areContentsTheSame(a: Worker, b: Worker) = a == b
@@ -247,15 +271,35 @@ class WorkerAdapter(
     inner class VH(val v: View) : RecyclerView.ViewHolder(v)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH =
         VH(LayoutInflater.from(parent.context).inflate(R.layout.item_worker, parent, false))
+
     override fun onBindViewHolder(h: VH, pos: Int) {
         val w = getItem(pos)
+        val (totalPaid, lastMonth, lastSummary) = getStats(w)
+
+        // Avatar initials (up to 2 chars)
+        val initials = w.name.trim().split(" ")
+            .filter { it.isNotEmpty() }
+            .take(2)
+            .joinToString("") { it.first().uppercaseChar().toString() }
+        h.v.findViewById<TextView>(R.id.tv_initials).text = initials
+
         h.v.findViewById<TextView>(R.id.tv_name).text    = w.name
         h.v.findViewById<TextView>(R.id.tv_wage).text    = "${Fmt.money(w.wagePerDay)}/day · ${w.mobile}"
         h.v.findViewById<TextView>(R.id.tv_address).text = w.address
-        val iv = h.v.findViewById<android.widget.ImageView>(R.id.iv_photo)
-        if (w.photoPath != null) { iv.setImageURI(Uri.parse(w.photoPath)); iv.visibility = View.VISIBLE }
-        else iv.visibility = View.GONE
-        h.v.findViewById<View>(R.id.btn_edit).setOnClickListener { onEdit(w) }
+
+        h.v.findViewById<TextView>(R.id.tv_total_paid).text = Fmt.money(totalPaid)
+        h.v.findViewById<TextView>(R.id.tv_last_close).text = lastMonth ?: "—"
+
+        val llLastMonth   = h.v.findViewById<View>(R.id.ll_last_month)
+        val tvLastSummary = h.v.findViewById<TextView>(R.id.tv_last_month_summary)
+        if (lastSummary != null) {
+            tvLastSummary.text    = lastSummary
+            llLastMonth.visibility = View.VISIBLE
+        } else {
+            llLastMonth.visibility = View.GONE
+        }
+
+        h.v.findViewById<View>(R.id.btn_edit).setOnClickListener   { onEdit(w) }
         h.v.findViewById<View>(R.id.btn_delete).setOnClickListener { onDelete(w) }
     }
 }

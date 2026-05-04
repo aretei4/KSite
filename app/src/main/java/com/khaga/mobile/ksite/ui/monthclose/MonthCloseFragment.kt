@@ -90,8 +90,8 @@ class MonthCloseFragment : Fragment() {
         val tvNetPayable       = v.findViewById<TextView>(R.id.tv_net_payable)
         val tvWageFormula      = v.findViewById<TextView>(R.id.tv_wage_formula)
 
-        spSite.adapter   = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sites.map { it.name }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
-        spWorker.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, workers.map { "${it.name} (${Fmt.money(it.wagePerDay)}/day)" }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        spSite.adapter   = ArrayAdapter(requireContext(), R.layout.item_spinner, sites.map { it.name }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        spWorker.adapter = ArrayAdapter(requireContext(), R.layout.item_spinner, workers.map { "${it.name} (${Fmt.money(it.wagePerDay)}/day)" }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
         etMonth.setText(Fmt.currentMonthIso())
 
         // Cached taken total for net payable calculation

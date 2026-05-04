@@ -1,5 +1,6 @@
 package com.khaga.mobile.ksite.ui.give
 
+import android.app.DatePickerDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -15,6 +16,7 @@ import com.khaga.mobile.ksite.data.model.*
 import com.khaga.mobile.ksite.databinding.FragmentGiveBinding
 import com.khaga.mobile.ksite.util.*
 import com.khaga.mobile.ksite.viewmodel.MainViewModel
+import java.util.Calendar
 import java.util.UUID
 
 class GiveFragment : Fragment() {
@@ -42,6 +44,9 @@ class GiveFragment : Fragment() {
         binding.btnRecord.setOnClickListener { showDialog(null) }
 
         vm.payments.observe(viewLifecycleOwner) { list ->
+            // Hide loader, show list on first data arrival
+            binding.layoutLoading.visibility = View.GONE
+            binding.recycler.visibility      = View.VISIBLE
             adapter.submitList(list)
             binding.tvTotalAmount.text  = Fmt.money(list.sumOf { it.amount })
             binding.tvEntriesCount.text = list.size.toString()
@@ -66,10 +71,20 @@ class GiveFragment : Fragment() {
         val etNote   = v.findViewById<EditText>(R.id.et_note)
         val tvHint   = v.findViewById<TextView>(R.id.tv_wage_hint)
 
-        spSite.adapter   = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sites.map { it.name }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
-        spWorker.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, workers.map { "${it.name} (${Fmt.money(it.wagePerDay)}/day)" }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
-        spHead.adapter   = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, PAY_HEADS).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
-        spMode.adapter   = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, PAY_MODES).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        spSite.adapter   = ArrayAdapter(requireContext(), R.layout.item_spinner, sites.map { it.name }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        spWorker.adapter = ArrayAdapter(requireContext(), R.layout.item_spinner, workers.map { "${it.name} (${Fmt.money(it.wagePerDay)}/day)" }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        spHead.adapter   = ArrayAdapter(requireContext(), R.layout.item_spinner, PAY_HEADS).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        spMode.adapter   = ArrayAdapter(requireContext(), R.layout.item_spinner, PAY_MODES).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+
+        // Date picker — tap field to choose date
+        etDate.setOnClickListener {
+            val parts = etDate.text.toString().split("-").map { it.toIntOrNull() ?: 0 }
+            val cal = Calendar.getInstance()
+            if (parts.size == 3 && parts[0] > 0) cal.set(parts[0], parts[1] - 1, parts[2])
+            DatePickerDialog(requireContext(), { _, y, m, d ->
+                etDate.setText("%04d-%02d-%02d".format(y, m + 1, d))
+            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+        }
 
         fun updateHint() {
             val w = workers.getOrNull(spWorker.selectedItemPosition)

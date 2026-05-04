@@ -1,48 +1,173 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical" android:padding="16dp">
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="SITE" android:textSize="10sp" android:textStyle="bold" android:textColor="@color/text_secondary"/>
-        <Spinner android:id="@+id/sp_site" android:layout_width="match_parent" android:layout_height="48dp"/>
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="CLIENT / FROM" android:textSize="10sp" android:textStyle="bold"
-            android:textColor="@color/text_secondary" android:layout_marginTop="8dp"/>
-        <EditText android:id="@+id/et_from" android:layout_width="match_parent"
-            android:layout_height="48dp" android:hint="Client name"/>
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:layout_marginTop="8dp">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:orientation="vertical" android:layout_marginEnd="8dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="TOTAL BILLED ₹" android:textSize="10sp" android:textStyle="bold" android:textColor="@color/text_secondary"/>
-                <EditText android:id="@+id/et_amount" android:layout_width="match_parent"
-                    android:layout_height="48dp" android:inputType="number" android:hint="0"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/card">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Title row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="20dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Record collection"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"/>
+                <TextView
+                    android:id="@+id/tv_dialog_close"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:text="×"
+                    android:textSize="22sp"
+                    android:gravity="center"
+                    android:textColor="@color/text_secondary"/>
             </LinearLayout>
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:orientation="vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="RECEIVED ₹" android:textSize="10sp" android:textStyle="bold" android:textColor="@color/text_secondary"/>
-                <EditText android:id="@+id/et_received" android:layout_width="match_parent"
-                    android:layout_height="48dp" android:inputType="number" android:hint="0"/>
+
+            <!-- SITE -->
+            <TextView
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="SITE" android:textSize="10sp" android:textStyle="bold"
+                android:letterSpacing="0.08" android:textColor="@color/text_secondary"
+                android:layout_marginBottom="6dp"/>
+            <Spinner
+                android:id="@+id/sp_site"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_input_field"
+                android:paddingStart="12dp"/>
+
+            <!-- CLIENT / RECEIVED FROM -->
+            <TextView
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="CLIENT / RECEIVED FROM" android:textSize="10sp" android:textStyle="bold"
+                android:letterSpacing="0.08" android:textColor="@color/text_secondary"
+                android:layout_marginTop="14dp" android:layout_marginBottom="6dp"/>
+            <EditText
+                android:id="@+id/et_from"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_input_field"
+                android:paddingHorizontal="12dp"
+                android:hint="Surya Constructions"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:gravity="center_vertical"
+                android:inputType="textCapWords"/>
+
+            <!-- TOTAL BILLED | RECEIVED -->
+            <LinearLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:layout_marginTop="14dp">
+
+                <LinearLayout
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical"
+                    android:layout_marginEnd="8dp">
+                    <TextView
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="TOTAL BILLED (₹)" android:textSize="10sp" android:textStyle="bold"
+                        android:letterSpacing="0.08" android:textColor="@color/text_secondary"
+                        android:layout_marginBottom="6dp"/>
+                    <EditText
+                        android:id="@+id/et_amount"
+                        android:layout_width="match_parent" android:layout_height="52dp"
+                        android:background="@drawable/bg_input_field"
+                        android:paddingHorizontal="12dp" android:inputType="number" android:hint="0"
+                        android:textColor="@color/text_primary" android:textColorHint="@color/text_secondary"
+                        android:gravity="center_vertical"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="RECEIVED (₹)" android:textSize="10sp" android:textStyle="bold"
+                        android:letterSpacing="0.08" android:textColor="@color/text_secondary"
+                        android:layout_marginBottom="6dp"/>
+                    <EditText
+                        android:id="@+id/et_received"
+                        android:layout_width="match_parent" android:layout_height="52dp"
+                        android:background="@drawable/bg_input_field"
+                        android:paddingHorizontal="12dp" android:inputType="number" android:hint="0"
+                        android:textColor="@color/text_primary" android:textColorHint="@color/text_secondary"
+                        android:gravity="center_vertical"/>
+                </LinearLayout>
             </LinearLayout>
+
+            <!-- MODE | DATE -->
+            <LinearLayout
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:layout_marginTop="14dp">
+
+                <LinearLayout
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical"
+                    android:layout_marginEnd="8dp">
+                    <TextView
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="MODE" android:textSize="10sp" android:textStyle="bold"
+                        android:letterSpacing="0.08" android:textColor="@color/text_secondary"
+                        android:layout_marginBottom="6dp"/>
+                    <Spinner
+                        android:id="@+id/sp_mode"
+                        android:layout_width="match_parent" android:layout_height="52dp"
+                        android:background="@drawable/bg_input_field"
+                        android:paddingStart="12dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="DATE" android:textSize="10sp" android:textStyle="bold"
+                        android:letterSpacing="0.08" android:textColor="@color/text_secondary"
+                        android:layout_marginBottom="6dp"/>
+                    <EditText
+                        android:id="@+id/et_date"
+                        android:layout_width="match_parent" android:layout_height="52dp"
+                        android:background="@drawable/bg_input_field"
+                        android:paddingHorizontal="12dp"
+                        android:focusable="false" android:clickable="true" android:cursorVisible="false"
+                        android:inputType="none"
+                        android:drawableEnd="@android:drawable/ic_menu_my_calendar"
+                        android:drawableTint="@color/text_secondary"
+                        android:textColor="@color/text_primary" android:textColorHint="@color/text_secondary"
+                        android:gravity="center_vertical"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Save button -->
+            <TextView
+                android:id="@+id/btn_save_collection"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_button_dark"
+                android:gravity="center"
+                android:text="Save collection"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
         </LinearLayout>
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:layout_marginTop="8dp">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:orientation="vertical" android:layout_marginEnd="8dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="MODE" android:textSize="10sp" android:textStyle="bold" android:textColor="@color/text_secondary"/>
-                <Spinner android:id="@+id/sp_mode" android:layout_width="match_parent" android:layout_height="48dp"/>
-            </LinearLayout>
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:orientation="vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="DATE" android:textSize="10sp" android:textStyle="bold" android:textColor="@color/text_secondary"/>
-                <EditText android:id="@+id/et_date" android:layout_width="match_parent"
-                    android:layout_height="48dp" android:hint="2025-04-30"/>
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</LinearLayout>

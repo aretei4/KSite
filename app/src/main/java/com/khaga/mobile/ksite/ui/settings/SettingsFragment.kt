@@ -89,6 +89,8 @@ class SitesTabFragment : Fragment() {
         rv.adapter = adapter
         btnAdd.setOnClickListener { showSiteDialog(null) }
         vm.sites.observe(viewLifecycleOwner) { adapter.submitList(it) }
+        vm.payments.observe(viewLifecycleOwner)    { adapter.submitList(vm.sites.value ?: emptyList()) }
+        vm.collections.observe(viewLifecycleOwner) { adapter.submitList(vm.sites.value ?: emptyList()) }
     }
 
     private fun showSiteDialog(existing: Site?) {
@@ -183,6 +185,8 @@ class WorkersTabFragment : Fragment() {
         rv.adapter = adapter
         btnAdd.setOnClickListener { showWorkerDialog(null, null) }
         vm.workers.observe(viewLifecycleOwner) { adapter.submitList(it) }
+        vm.payments.observe(viewLifecycleOwner)    { adapter.submitList(vm.workers.value ?: emptyList()) }
+        vm.collections.observe(viewLifecycleOwner) { adapter.submitList(vm.workers.value ?: emptyList()) }
     }
 
     /** Prepares the output file and fires the camera intent. */

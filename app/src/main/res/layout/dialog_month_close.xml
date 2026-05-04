@@ -99,7 +99,12 @@
                         android:textColor="@color/text_primary"
                         android:textColorHint="@color/text_secondary"
                         android:gravity="center_vertical"
-                        android:inputType="date"/>
+                        android:inputType="none"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:cursorVisible="false"
+                        android:drawableEnd="@android:drawable/ic_menu_my_calendar"
+                        android:drawableTint="@color/text_secondary"/>
                 </LinearLayout>
             </LinearLayout>
 

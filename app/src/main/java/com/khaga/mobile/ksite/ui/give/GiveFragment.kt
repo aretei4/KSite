@@ -51,6 +51,8 @@ class GiveFragment : Fragment() {
             binding.tvTotalAmount.text  = Fmt.money(list.sumOf { it.amount })
             binding.tvEntriesCount.text = list.size.toString()
         }
+        vm.workers.observe(viewLifecycleOwner) { adapter.submitList(vm.payments.value ?: emptyList()) }
+        vm.sites.observe(viewLifecycleOwner)   { adapter.submitList(vm.payments.value ?: emptyList()) }
     }
 
     private fun showDialog(existing: Payment?) {

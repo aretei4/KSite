@@ -1,5 +1,6 @@
 package com.khaga.mobile.ksite.ui.monthclose
 
+import android.app.DatePickerDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -17,6 +18,7 @@ import com.khaga.mobile.ksite.databinding.FragmentMonthCloseBinding
 import com.khaga.mobile.ksite.util.*
 import com.khaga.mobile.ksite.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import java.util.UUID
 
 // Sealed list item for grouped display
@@ -89,6 +91,19 @@ class MonthCloseFragment : Fragment() {
         val tvWageEarned       = v.findViewById<TextView>(R.id.tv_wage_earned)
         val tvNetPayable       = v.findViewById<TextView>(R.id.tv_net_payable)
         val tvWageFormula      = v.findViewById<TextView>(R.id.tv_wage_formula)
+
+        etMonth.isFocusable = false
+        etMonth.isClickable = true
+        etMonth.setOnClickListener {
+            val parts = etMonth.text.toString().split("-")
+            val y = parts.getOrNull(0)?.toIntOrNull() ?: Calendar.getInstance().get(Calendar.YEAR)
+            val m = (parts.getOrNull(1)?.toIntOrNull() ?: (Calendar.getInstance().get(Calendar.MONTH) + 1)) - 1
+            DatePickerDialog(requireContext(), { _, year, month, _ ->
+                etMonth.setText("%04d-%02d".format(year, month + 1))
+                updateTaken()
+                recalc()
+            }, y, m, 1).show()
+        }
 
         spSite.adapter   = ArrayAdapter(requireContext(), R.layout.item_spinner, sites.map { it.name }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
         spWorker.adapter = ArrayAdapter(requireContext(), R.layout.item_spinner, workers.map { "${it.name} (${Fmt.money(it.wagePerDay)}/day)" }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }

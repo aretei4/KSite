@@ -140,7 +140,7 @@ class MonthCloseFragment : Fragment() {
 
 // ── Adapter ───────────────────────────────────────────────────────────────────
 
-class MonthCloseAdapter(
+internal class MonthCloseAdapter(
     private val onDelete: (MonthClose) -> Unit,
     private val getWorkerName: (String) -> String,
     private val getSiteName: (String) -> String
